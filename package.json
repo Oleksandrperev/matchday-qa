@@ -1,0 +1,36 @@
+{
+  "name": "matchday-qa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:mobile": "playwright test --project='Mobile Chrome'",
+    "test:report": "playwright show-report",
+    "test:landing": "playwright test landing.spec.ts",
+    "test:form": "playwright test want-to-play.spec.ts",
+    "test:registration": "playwright test registration.spec.ts",
+    "test:e2e": "playwright test e2e-flow.spec.ts",
+    "test:debug": "playwright test --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oleksandrperev/matchday-qa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Oleksandrperev/matchday-qa/issues"
+  },
+  "homepage": "https://github.com/Oleksandrperev/matchday-qa#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
