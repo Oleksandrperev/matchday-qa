@@ -44,28 +44,26 @@ All POMs extend `BasePage` (`pages/BasePage.ts`), which holds the `Page` instanc
 ### Test Flow Dependency
 The registration and e2e tests have a hard prerequisite on the Want-to-Play form: `registration.spec.ts` and `e2e-flow.spec.ts` navigate through `/want-to-play` in `beforeEach` to reach `/register`. Direct navigation to `/register` without prior form state may not work depending on app routing.
 
-### AI Agents (`agents/`)
-Three utility classes, not Playwright tests:
-- **PlannerAgent** — holds `testPlans[]` mapping user story IDs to step-by-step scenarios; use `getPlansForStory(storyId)` to query.
-- **GeneratorAgent** — takes a `TestScenario` and produces a Playwright test code string scaffold.
-- **HealerAgent** — instantiated with a `Page` object; `runHealthCheck(selectors[])` probes each selector and logs broken ones with suggested Playwright-idiomatic alternatives.
+### AI Agents
+The `agents/` TypeScript classes have been replaced by three Claude subagents in `.claude/agents/`. They are invoked by Claude Code and use the `playwright-test` MCP server for live browser interaction:
+
+- **`playwright-test-planner`** — navigates the live app, explores all UI, and saves a structured markdown test plan to `specs/` via `planner_save_plan`. Always calls `planner_setup_page` first.
+- **`playwright-test-generator`** — takes a scenario from a saved plan, executes each step live via MCP tools, reads the generator log, then writes a single `.spec.ts` file via `generator_write_test`. Each generated test lives in a `test.describe` matching the plan group and references `tests/seed.spec.ts` as its seed.
+- **`playwright-test-healer`** — runs all tests via `test_run`, debugs failures with `test_debug`, inspects snapshots and selectors, edits test files, and re-runs until green. Marks genuinely broken app behavior as `test.fixme()` with an explanatory comment rather than deleting the test.
+
+### MCP Server
+`.mcp.json` and `.vscode/mcp.json` both configure the `playwright-test` MCP server (`npx playwright run-test-mcp-server`). This server provides the `browser_*`, `planner_*`, `generator_*`, and `test_*` tools used by the subagents.
+
+### Test Workflow
+1. Run the **planner** agent on a route → plan saved to `specs/`
+2. Run the **generator** agent for each scenario in the plan → `.spec.ts` files written to `tests/`
+3. Run the **healer** agent if tests fail after app changes
 
 ### Test Data
-`test-data/formData.ts` exports `validFormData` (used across all form/registration/e2e specs) and `minimalFormData`. The `location` and `timeRange` values (`'north-seattle'`, `'afternoon'`, etc.) must match the actual `<option value="">` attributes in the app's dropdowns.
+`test-data/formData.ts` exports `validFormData` (used across form/registration/e2e specs) and `minimalFormData`. The `location` and `timeRange` values (`'north-seattle'`, `'afternoon'`, etc.) must match the actual `<option value="">` attributes in the app's dropdowns.
 
 ### CI
 GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, installs deps for each, then runs chromium-only. The `matchday` app repo is `Oleksandrperev/matchday` and is cloned into `./soccer` so the `webServer.cwd: '../soccer'` path resolves correctly relative to the QA project root.
-
-## Current Status
-- ✅ Project setup complete
-- ✅ Page Object Models created (BasePage, LandingPage, WantToPlayPage, RegisterPage, ConfirmationPage)
-- ✅ AI Agents created (Planner, Generator, Healer)
-- ✅ GitHub Actions CI/CD configured
-- ⬜ Tests — to be written
-
-## Test Files Status
-tests/ directory is currently empty.
-Tests will be written manually following POM structure.
 
 ## App Under Test — Current Screens
 | Route | Status |
