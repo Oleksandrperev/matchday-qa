@@ -7,8 +7,8 @@ test.describe('Smoke Tests', () => {
   test('should verify core navigation flow', async ({ page }) => {
     // 1. Open http://localhost:5173
     await page.goto('http://localhost:5173');
-    await expect(page.getByRole('heading', { name: 'MatchDay' })).toBeVisible();
-    await expect(page.getByText('Find local soccer games in Washington')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'PickupSub' })).toBeVisible();
+    await expect(page.getByText('Find local pickup soccer games in Washington')).toBeVisible();
 
     // 2. Verify the 'Want to play' button is visible on the page
     await expect(page.getByRole('button', { name: 'soccer ball Want to play Find' })).toBeVisible();
