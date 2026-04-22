@@ -44,7 +44,7 @@ npx playwright test --project="Mobile Safari"
 ## Architecture
 
 ### App Under Test
-MatchDay is a React SPA at `http://localhost:5173`. The QA repo expects the app repo to live at `../soccer` (sibling directory). The Playwright `webServer` config starts `npm run dev` from that path automatically during local runs; in CI, the app is checked out to `./soccer`.
+MatchDay is a React SPA at `http://localhost:5173`. The QA repo expects the app repo to live at `../soccer` (sibling directory). The Playwright `webServer` config starts `npm run dev` from that path automatically during local runs; in CI, the app is checked out via GitHub Actions.
 
 ### Page Object Model
 All POMs extend `BasePage` (`pages/BasePage.ts`), which holds the `Page` instance and shared helpers (`navigate`, `waitForPageLoad`, `takeScreenshot`). Each page class declares all its `Locator` fields as `readonly` in the constructor and exposes high-level action methods (`fillCompleteForm`, `verifyPageLoaded`, etc.) so tests stay readable.
@@ -67,12 +67,12 @@ Three official Playwright AI agents configured in `.claude/agents/` and `.vscode
 - **`playwright-test-healer`** — runs failing tests, inspects snapshots, fixes broken selectors, re-runs until green. Marks genuinely broken app behavior as `test.fixme()`.
 
 ### Agent Workflow
-
-Ask Planner  → explores live app → saves plan to specs/
-Ask Generator → reads specs/ plan → writes tests/ spec files
-Run tests    → npx playwright test
-If failing   → ask Healer → auto-fixes broken selectors
-
+```
+1. Ask Planner  → explores live app → saves plan to specs/
+2. Ask Generator → reads specs/ plan → writes tests/ spec files
+3. Run tests    → npx playwright test
+4. If failing   → ask Healer → auto-fixes broken selectors
+```
 
 ### MCP Servers
 Two MCP servers configured in `.mcp.json`:
@@ -90,7 +90,19 @@ playwright-cli open http://localhost:5173 --headed
 `test-data/formData.ts` exports `validFormData` and `minimalFormData`. The `location` and `timeRange` values must match the actual `<option value="">` attributes in the app dropdowns.
 
 ### CI
-GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, installs deps for each, then runs chromium-only. The `matchday` app repo is `Oleksandrperev/matchday` and is cloned into `./soccer`.
+Two GitHub Actions workflows protect both repos:
+
+**matchday-qa repo** (`.github/workflows/playwright.yml`):
+- Triggers on push and PR to main
+- Checks out matchday app repo into `./soccer`
+- Runs smoke tests on Chromium
+- Branch protection active on main — merge blocked if tests fail
+
+**matchday repo** (`.github/workflows/smoke-tests.yml`):
+- Triggers on push and PR to main
+- Checks out matchday-qa repo
+- Starts app and runs smoke tests
+- Branch protection active on main — merge blocked if tests fail
 
 ## Current Test Status
 
@@ -124,7 +136,9 @@ GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, insta
 | `/games` | ⬜ Placeholder |
 
 ## Git Commit Convention
+```
 feat: description    # new feature
 fix: description     # bug fix
 chore: description   # maintenance
 test: description    # adding tests
+```
