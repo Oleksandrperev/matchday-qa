@@ -11,26 +11,34 @@ npx tsc --noEmit
 # Run all tests (requires MatchDay app running at ../soccer)
 npm test
 
+# Run smoke tests only
+npx playwright test tests/smoke/smoke.spec.ts
+
 # Run a single spec file
-npx playwright test landing.spec.ts
+npx playwright test tests/landing.spec.ts
 
 # Run a single test by title
-npx playwright test -g "should display MatchDay title"
+npx playwright test -g "should verify core navigation flow"
 
 # Run with browser visible
 npm run test:headed
 
+# Run in debug mode
+npx playwright test --debug
+
 # Interactive UI mode
 npm run test:ui
 
-# Debug a specific test
-npm run test:debug
-
 # Open last HTML report
-npm run test:report
+npx playwright show-report
 
 # Mobile browsers only
 npm run test:mobile
+
+# Run on specific browser
+npx playwright test --project=chromium
+npx playwright test --project="Mobile Chrome"
+npx playwright test --project="Mobile Safari"
 ```
 
 ## Architecture
@@ -41,31 +49,69 @@ MatchDay is a React SPA at `http://localhost:5173`. The QA repo expects the app 
 ### Page Object Model
 All POMs extend `BasePage` (`pages/BasePage.ts`), which holds the `Page` instance and shared helpers (`navigate`, `waitForPageLoad`, `takeScreenshot`). Each page class declares all its `Locator` fields as `readonly` in the constructor and exposes high-level action methods (`fillCompleteForm`, `verifyPageLoaded`, etc.) so tests stay readable.
 
+Available Page Objects:
+- `BasePage` — shared helpers and navigation
+- `LandingPage` — landing page locators and actions
+- `WantToPlayPage` — form locators, fill helpers, validation
+- `RegisterPage` — registration screen locators
+- `ConfirmationPage` — success screen locators
+
 ### Test Flow Dependency
 The registration and e2e tests have a hard prerequisite on the Want-to-Play form: `registration.spec.ts` and `e2e-flow.spec.ts` navigate through `/want-to-play` in `beforeEach` to reach `/register`. Direct navigation to `/register` without prior form state may not work depending on app routing.
 
 ### AI Agents
-The `agents/` TypeScript classes have been replaced by three Claude subagents in `.claude/agents/`. They are invoked by Claude Code and use the `playwright-test` MCP server for live browser interaction:
+Three official Playwright AI agents configured in `.claude/agents/` and `.vscode/agents/`. Invoked by Claude Code using the `playwright-test` MCP server:
 
-- **`playwright-test-planner`** — navigates the live app, explores all UI, and saves a structured markdown test plan to `specs/` via `planner_save_plan`. Always calls `planner_setup_page` first.
-- **`playwright-test-generator`** — takes a scenario from a saved plan, executes each step live via MCP tools, reads the generator log, then writes a single `.spec.ts` file via `generator_write_test`. Each generated test lives in a `test.describe` matching the plan group and references `tests/seed.spec.ts` as its seed.
-- **`playwright-test-healer`** — runs all tests via `test_run`, debugs failures with `test_debug`, inspects snapshots and selectors, edits test files, and re-runs until green. Marks genuinely broken app behavior as `test.fixme()` with an explanatory comment rather than deleting the test.
+- **`playwright-test-planner`** — navigates the live app, explores all UI, and saves a structured markdown test plan to `specs/`. Always call with a seed test and target route.
+- **`playwright-test-generator`** — reads a plan from `specs/`, executes each step live, then writes `.spec.ts` files to `tests/`. Reference `tests/seed.spec.ts` as the seed.
+- **`playwright-test-healer`** — runs failing tests, inspects snapshots, fixes broken selectors, re-runs until green. Marks genuinely broken app behavior as `test.fixme()`.
 
-### MCP Server
-`.mcp.json` and `.vscode/mcp.json` both configure the `playwright-test` MCP server (`npx playwright run-test-mcp-server`). This server provides the `browser_*`, `planner_*`, `generator_*`, and `test_*` tools used by the subagents.
+### Agent Workflow
 
-### Test Workflow
-1. Run the **planner** agent on a route → plan saved to `specs/`
-2. Run the **generator** agent for each scenario in the plan → `.spec.ts` files written to `tests/`
-3. Run the **healer** agent if tests fail after app changes
+Ask Planner  → explores live app → saves plan to specs/
+Ask Generator → reads specs/ plan → writes tests/ spec files
+Run tests    → npx playwright test
+If failing   → ask Healer → auto-fixes broken selectors
+
+
+### MCP Servers
+Two MCP servers configured in `.mcp.json`:
+- **`playwright-test`** — powers the Planner, Generator, Healer agents (`npx playwright run-test-mcp-server`)
+- **`playwright`** — gives Claude Code direct browser control (`npx @playwright/mcp@latest`)
+
+### Playwright CLI
+Installed globally for token-efficient browser automation:
+```bash
+npm install -g @playwright/cli
+playwright-cli open http://localhost:5173 --headed
+```
 
 ### Test Data
-`test-data/formData.ts` exports `validFormData` (used across form/registration/e2e specs) and `minimalFormData`. The `location` and `timeRange` values (`'north-seattle'`, `'afternoon'`, etc.) must match the actual `<option value="">` attributes in the app's dropdowns.
+`test-data/formData.ts` exports `validFormData` and `minimalFormData`. The `location` and `timeRange` values must match the actual `<option value="">` attributes in the app dropdowns.
 
 ### CI
-GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, installs deps for each, then runs chromium-only. The `matchday` app repo is `Oleksandrperev/matchday` and is cloned into `./soccer` so the `webServer.cwd: '../soccer'` path resolves correctly relative to the QA project root.
+GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, installs deps for each, then runs chromium-only. The `matchday` app repo is `Oleksandrperev/matchday` and is cloned into `./soccer`.
+
+## Current Test Status
+
+| Test File | Tests | Status |
+|---|---|---|
+| `tests/smoke/smoke.spec.ts` | 3 | ✅ Passing |
+| `tests/landing.spec.ts` | - | ⬜ Not written yet |
+| `tests/want-to-play.spec.ts` | - | ⬜ Not written yet |
+| `tests/registration.spec.ts` | - | ⬜ Not written yet |
+| `tests/e2e-flow.spec.ts` | - | ⬜ Not written yet |
+
+## Test Plans (specs/)
+
+| Plan File | Status |
+|---|---|
+| `specs/smoke-test.md` | ✅ Created by Planner |
+| `specs/landing-page-plan.md` | ✅ Created by Planner (27 tests) |
+| `specs/matchday-flows.md` | ⬜ Pending |
 
 ## App Under Test — Current Screens
+
 | Route | Status |
 |---|---|
 | `/` | ✅ Built |
@@ -76,3 +122,9 @@ GitHub Actions (`.github/workflows/playwright.yml`) checks out both repos, insta
 | `/need-players` | ⬜ Placeholder |
 | `/login` | ⬜ Placeholder |
 | `/games` | ⬜ Placeholder |
+
+## Git Commit Convention
+feat: description    # new feature
+fix: description     # bug fix
+chore: description   # maintenance
+test: description    # adding tests
