@@ -39,6 +39,16 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Install wait-on
+        run: npm install -g wait-on
+
+      - name: Start MatchDay app
+        working-directory: soccer
+        run: npm run dev &
+
+      - name: Wait for app to be ready
+        run: wait-on http://localhost:5173 --timeout 30000
+
       - name: Run Smoke Tests
         run: npx playwright test tests/smoke/smoke.spec.ts --project=chromium
 
@@ -57,3 +67,4 @@ jobs:
           name: failure-screenshots
           path: test-results/
           retention-days: 7
+          
