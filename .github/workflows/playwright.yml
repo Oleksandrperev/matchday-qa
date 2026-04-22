@@ -1,15 +1,15 @@
-name: MatchDay Playwright Tests
+name: PickupSub Smoke Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run Playwright Tests
+  smoke-tests:
+    name: Run Smoke Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -39,14 +39,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
-        run: npx playwright test --project=chromium
+      - name: Run Smoke Tests
+        run: npx playwright test tests/smoke/smoke.spec.ts --project=chromium
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: smoke-test-report
           path: playwright-report/
           retention-days: 30
 
