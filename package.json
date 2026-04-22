@@ -1,7 +1,7 @@
 {
-  "name": "matchday-qa",
+  "name": "pickupsub-qa",
   "version": "1.0.0",
-  "description": "",
+  "description": "PickupSub QA Automation — Playwright + TypeScript test suite",
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
