@@ -1,0 +1,61 @@
+- generic [ref=e42]:
+  - navigation [ref=e43]:
+    - button "Go back" [ref=e44] [cursor=pointer]: ←
+    - heading "Want to Play" [level=1] [ref=e45]
+  - main [ref=e46]:
+    - paragraph [ref=e47]: Tell us about your availability and we'll help you find a game
+    - generic [ref=e48]:
+      - generic [ref=e50]: When do you want to play?
+      - generic [ref=e52]:
+        - button "Today" [ref=e53] [cursor=pointer]
+        - button "Tomorrow" [ref=e54] [cursor=pointer]
+        - button "Pick a date" [ref=e55] [cursor=pointer]
+    - generic [ref=e57]:
+      - generic [ref=e59]: What time works for you?
+      - combobox [ref=e60] [cursor=pointer]:
+        - option "Select time range" [disabled] [selected]
+        - option "Morning (6am — 12pm)"
+        - option "Afternoon (12pm — 5pm)"
+        - option "Evening (5pm — 9pm)"
+        - option "Night (9pm — 12am)"
+    - generic [ref=e62]:
+      - generic [ref=e64]: Where in Washington?
+      - combobox [ref=e65] [cursor=pointer]:
+        - option "Select your area" [disabled] [selected]
+        - option "Any location"
+        - option "North Seattle"
+        - option "South Seattle"
+        - option "East Seattle / Capitol Hill"
+        - option "Bellevue / Eastside"
+        - option "Redmond / Kirkland"
+        - option "Tacoma area"
+        - option "Everett / Lynnwood area"
+        - option "Spokane area"
+        - option "Other Washington"
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]: Your preferred position
+        - generic [ref=e70]: (optional)
+      - combobox [ref=e71] [cursor=pointer]:
+        - option "Select position" [selected]
+        - option "Any position"
+        - option "Goalkeeper"
+        - option "Defender"
+        - option "Midfielder"
+        - option "Forward"
+    - generic [ref=e73]:
+      - generic [ref=e75]: Your skill level
+      - generic [ref=e76]:
+        - button "Beginner Just starting out" [ref=e77] [cursor=pointer]:
+          - generic [ref=e78]: Beginner
+          - generic [ref=e79]: Just starting out
+        - button "Intermediate Play regularly" [ref=e80] [cursor=pointer]:
+          - generic [ref=e81]: Intermediate
+          - generic [ref=e82]: Play regularly
+        - button "Advanced Very experienced" [ref=e83] [cursor=pointer]:
+          - generic [ref=e84]: Advanced
+          - generic [ref=e85]: Very experienced
+        - button "Competitive League / tournament" [ref=e86] [cursor=pointer]:
+          - generic [ref=e87]: Competitive
+          - generic [ref=e88]: League / tournament
+  - button "Find a Game ⚽" [ref=e91] [cursor=pointer]

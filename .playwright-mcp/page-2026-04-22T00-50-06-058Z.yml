@@ -1,0 +1,35 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic:
+      - img
+    - generic [ref=e6]:
+      - img "soccer ball" [ref=e7]: ⚽
+      - heading "MatchDay" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Find local soccer games in Washington
+  - generic [ref=e10]:
+    - paragraph [ref=e11]: What are you looking for?
+    - generic [ref=e12]:
+      - button "soccer ball Want to play Find a game near you" [ref=e13] [cursor=pointer]:
+        - img "soccer ball" [ref=e15]: ⚽
+        - generic [ref=e16]:
+          - generic [ref=e17]: Want to play
+          - generic [ref=e18]: Find a game near you
+        - generic [ref=e19]: ›
+      - button "soccer ball Need players Post a game, find subs" [ref=e20] [cursor=pointer]:
+        - img "soccer ball" [ref=e22]: ⚽
+        - generic [ref=e23]:
+          - generic [ref=e24]: Need players
+          - generic [ref=e25]: Post a game, find subs
+        - generic [ref=e26]: ›
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]: 500+
+      - generic [ref=e30]: Active players
+    - generic [ref=e32]:
+      - generic [ref=e33]: 50+
+      - generic [ref=e34]: Games weekly
+  - generic [ref=e36]:
+    - paragraph [ref=e37]:
+      - text: Already have an account?
+      - button "Log in" [ref=e38] [cursor=pointer]
+    - paragraph [ref=e39]: Soccer only · Washington State
