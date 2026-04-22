@@ -15,8 +15,8 @@ export class LandingPage extends BasePage {
     this.wantToPlayButton = page.getByRole('button', { name: /want to play/i });
     this.needPlayersButton = page.getByRole('button', { name: /need players/i });
     this.loginLink = page.getByRole('link', { name: /log in/i });
-    this.appTitle = page.getByText('MatchDay');
-    this.tagline = page.getByText(/find local soccer games/i);
+    this.appTitle = page.getByText('PickupSub');
+    this.tagline = page.getByText(/find local pickup soccer games/i);
     this.activePlayers = page.getByText('500+');
     this.gamesWeekly = page.getByText('50+');
   }
