@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Type-check without emitting
 npx tsc --noEmit
 
-# Run all tests (requires MatchDay app running at ../soccer)
+# Run all tests (requires PickupSub app running at ../pickupsub)
 npm test
 
 # Run smoke tests only
@@ -44,7 +44,10 @@ npx playwright test --project="Mobile Safari"
 ## Architecture
 
 ### App Under Test
-MatchDay is a React SPA at `http://localhost:5173`. The QA repo expects the app repo to live at `../soccer` (sibling directory). The Playwright `webServer` config starts `npm run dev` from that path automatically during local runs; in CI, the app is checked out via GitHub Actions.
+PickupSub is a React SPA at `http://localhost:5173`.
+Local app folder: `~/pickupsub` (sibling directory `../pickupsub`)
+GitHub app repo: `Oleksandrperev/matchday`
+The Playwright `webServer` config starts `npm run dev` from `../pickupsub` automatically during local runs. In CI, the app is checked out via GitHub Actions.
 
 ### Page Object Model
 All POMs extend `BasePage` (`pages/BasePage.ts`), which holds the `Page` instance and shared helpers (`navigate`, `waitForPageLoad`, `takeScreenshot`). Each page class declares all its `Locator` fields as `readonly` in the constructor and exposes high-level action methods (`fillCompleteForm`, `verifyPageLoaded`, etc.) so tests stay readable.
@@ -94,15 +97,22 @@ Two GitHub Actions workflows protect both repos:
 
 **matchday-qa repo** (`.github/workflows/playwright.yml`):
 - Triggers on push and PR to main
-- Checks out matchday app repo into `./soccer`
+- Checks out matchday app repo (`Oleksandrperev/matchday`) into `./pickupsub`
 - Runs smoke tests on Chromium
 - Branch protection active on main — merge blocked if tests fail
 
 **matchday repo** (`.github/workflows/smoke-tests.yml`):
 - Triggers on push and PR to main
-- Checks out matchday-qa repo
+- Checks out matchday-qa repo into `./pickupsub-qa`
 - Starts app and runs smoke tests
 - Branch protection active on main — merge blocked if tests fail
+
+## Important Notes
+
+- Local dev server must run on port 5173 — smoke tests check this port
+- If port 5173 is busy run: `pkill -f vite` then `cd ~/pickupsub && npm run dev`
+- GitHub repo name is `matchday-qa` — local folder renamed to `pickupsub-qa`
+- App GitHub repo name is `matchday` — local folder renamed to `pickupsub`
 
 ## Current Test Status
 
